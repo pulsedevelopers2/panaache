@@ -1,6 +1,9 @@
 var crypto = require('crypto');
 const AuthDB = require('./authDB')
+const bcrypt = require ('bcrypt');
+
 const authDB = new AuthDB();
+
 class AuthUtilities{
         encrypt(text){
         var mykey = crypto.createCipher('aes-128-cbc', 'panaache');
@@ -14,6 +17,7 @@ class AuthUtilities{
             mystr += mykey.final('utf8');
             return mystr;
         }
+
         createHash(text){
             const saltRounds = Math.floor(Math.random()*10);  //  Data processing speed
             var password = text;  // Original Password
@@ -23,10 +27,74 @@ class AuthUtilities{
             });``
             return { salt: saltRounds, hash: hashed}
         }
-        addNewUser(body){
-            let result = authDB.insertNewUser(body);
+
+        async addNewUser(body,msg){
+            let otp = msg.toString()
+            otp = this.encrypt(otp)
+            let result = await authDB.insertNewUser(body,otp);
+            return result;
+        }
+
+        async loginCheck(body){
+            let salt = await authDB.loginUser(body);
+            let secret = salt[0][0].secret;
+            return await bcrypt.compare(body.password, salt[0][0].password);    
+            //return result;
+        }
+
+        async emailCheck(body){
+            var result =  await authDB.checkUser(body);
+            return result;
+         }
+
+        async verifiedUser(body){
+            let result = await authDB.getUser(body.email); 
+            //console.log(result)
+            if(result && result.verified == "1") {
+                //console.log('here')
+                return true;
+            }
+            return false;
+         }
+
+         async otpCheck(body){
+             var emailOtp = body.emailOtp.toString();
+            var emailOtp = this.encrypt(body.emailOtp);
+             //var passwd = this.decrypt(body.password)
+             var result = await authDB.verifyOtp(body,emailOtp)
+             return result;
+         }
+
+         async resendOtp(body,msg){
+            //var passwd = this.decrypt(body.password)
+            let otp = msg.toString()
+            otp = this.encrypt(otp)
+            var result = await authDB.resend(body,otp)
+            return true;
+         }
+
+         sendToken(body){
+            var mail = body.email;
+            var time = new Date().getTime() + 7200000 
+            var cacheTime = new Date().getTime() + 2592000000
+            var token = {
+                email:mail,
+                key:time
+                };
+            // token = JSON.stringify(token);
+            // token = this.encrypt(token);
+            var cacheToken = {
+                email:mail,
+                key:cacheTime
+            }
+            var result = {
+                token:token,
+                cacheToken : cacheToken
+            }
+            result = JSON.stringify(result);
+            result = this.encrypt(result);
+            console.log(this.decrypt(result))
             return result;
         }
 }
-
 module.exports = AuthUtilities; 
