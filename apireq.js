@@ -15,6 +15,7 @@ const utils = new Utils();
 app.use(Cors())
 app.use(bodyParser.urlencoded({extended : false}))
 var jsonParser = bodyParser.json();
+
 app.post('/', function (req, res) {
   res.send('hello world')
 });

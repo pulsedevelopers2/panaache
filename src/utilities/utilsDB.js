@@ -21,7 +21,7 @@ class UtilsDB{
     async getItem(id){
         var sql = `Select * from items where id = "${id}"`;
         let res = await mysql.query(sql);
-        return (res[0].length ? res[0] : null); 
+        return (res[0].length ? res[0][0] : null); 
     }
 
     async getMetals(id){
@@ -40,6 +40,12 @@ class UtilsDB{
         var sql = `Select * from stocks where id = "${id}"`;
         let res = await mysql.query(sql);
         return (res[0].length ? res[0] : null); 
+    }
+
+    async getPrice(ct,quality,color){
+        var sql = `Select price from qcs_pricing where quality = "${quality}" and color = "${color}" and carat_wt = ${ct}`
+        let result = await mysql.query(sql);
+        return (result[0].length ? result[0][0].price : null);
     }
 }
 module.exports = UtilsDB;

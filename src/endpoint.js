@@ -33,9 +33,11 @@ class Endpoint{
     }
 
     async getPrice(req,res){
-        let body = req.body
-        console.log(req.body);
-        return body;
+        let id = req.body.item_id;
+        let quality = req.body.d_quality;
+        let color = req.body.d_color;
+        let result = utils.getPrice(id,quality,color);
+        return result;
     }
 }
 module.exports = Endpoint;
