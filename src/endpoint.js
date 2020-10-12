@@ -1,6 +1,5 @@
 const Utils = require('./utilities/utils')
 const Auth = require('./authutilities/authutilities')
-
 const auth =new Auth();
 const utils = new Utils();
 

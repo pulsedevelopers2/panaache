@@ -12,6 +12,7 @@ class UtilsDB{
             database:"u386445862_panaache"
           });
     }
+    
     async getItems(category){
         var sql = `Select * from items where category = "${category}"`;
         let res = await mysql.query(sql);
@@ -25,7 +26,6 @@ class UtilsDB{
     }
 
     async getItemDetails(select, table, detail, id){
-        
         var sql = `Select ${select} from ${table[detail] || detail} where id = "${id}"`;
         let res = await mysql.query(sql);
         return (res[0].length ? res[0] : null); 

@@ -10,7 +10,6 @@ class Utils{
     }
     
     async getItem(id){
-        var i;
         let result = await utilsDB.getItem(id);
         result = this.purifyItems([result])[0];
         [result.metal, result.fashion, result.stock] = await Promise.all([this.getItemDetails('metal', id), this.getItemDetails('fashion', id), this.getItemDetails('stock', id)]);
@@ -54,22 +53,24 @@ class Utils{
             return details;
         }));
 
-        result.gold_details = await Promise.all(result.gold_details.map(async item => {
+        result.gold_details = await Promise.all(result.gold_details && result.gold_details.map(async item => {
             let price = 0;
             price = (item.weight * 0.77 * 5000)/0.995;
             let details = this.getGoldCosting(item, price) 
             return details;
-        }));
+        }) || []);
 
-        let gold_rate =  this.getGoldRates(result.gold_details,size)//result['gold_details'][x].price //(result.gold_wt*0.77*5000)/0.995 //Gold Rates
-        let making_charges = result.gold_wt * 900;
+        let gold_rates = result.gold_details.length && await this.getGoldRates(result.gold_details.length && result.gold_details ,size) || {size:'default',weight:result.gold_wt, price: (result.gold_wt * 0.77 * 5000)/0.995}
+        let gold_rate =  gold_rates.price  //result['gold_details'][x].price //(result.gold_wt*0.77*5000)/0.995 //Gold Rates
+        let making_charges = gold_rates.weight * 900;
         let gst = (gold_rate + making_charges + diamond_cost)*0.03;//gst 3%
         let total_cost = gold_rate + making_charges + diamond_cost + gst;//total
         result.diamond_cost = diamond_cost;
         result.gold_rate = gold_rate;
         result.making_charges = making_charges;
         result.gst = gst;
-        result.total_cost = total_cost;
+        result.total_cost = Math.round(total_cost);
+        result.gold_weight = gold_rates.weight;
         return result;
     }
 
@@ -85,14 +86,14 @@ class Utils{
         return temp_item;
     }
 
-    getGoldRates(result,size){
+    getGoldRates(result,size='default'){
         let arr = result.filter(item => {
             if (item.size == size) {
                 return true;
             }
             return false;
         });
-        return arr[0] && arr[0].price || result[0].price;
+        return arr[0] && arr[0] || result[0];
     }
 
     purifyItems(body) {
