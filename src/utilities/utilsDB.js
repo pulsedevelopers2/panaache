@@ -24,20 +24,9 @@ class UtilsDB{
         return (res[0].length ? res[0][0] : null); 
     }
 
-    async getMetals(id){
-        var sql = `Select * from item_category where id = "${id}"`;
-        let res = await mysql.query(sql);
-        return (res[0].length ? res[0] : null); 
-    }
-    
-    async getFashion(id){
-        var sql = `Select * from fashion_category where id = "${id}"`;
-        let res = await mysql.query(sql);
-        return (res[0].length ? res[0] : null); 
-    }
-
-    async getStock(id){
-        var sql = `Select * from stocks where id = "${id}"`;
+    async getItemDetails(select, table, detail, id){
+        
+        var sql = `Select ${select} from ${table[detail] || detail} where id = "${id}"`;
         let res = await mysql.query(sql);
         return (res[0].length ? res[0] : null); 
     }

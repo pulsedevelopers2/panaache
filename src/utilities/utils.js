@@ -5,7 +5,6 @@ const utilsDB = new UtilsDB();
 
 class Utils{
     async getItems(category){
-        var i;
         let result = await utilsDB.getItems(category);
         return this.purifyItems(result);
     }
@@ -14,58 +13,28 @@ class Utils{
         var i;
         let result = await utilsDB.getItem(id);
         result = this.purifyItems([result])[0];
-        var metal = null;
-        var fashion = null;
-        if(result.metal){
-            metal = await this.getMetals(id);
-        }
-        if(result.fashion){
-            fashion = await this.getFashion(id);
-        }
-        let stock = await this.getStock(id);
-        result.metal=metal;
-        result.fashion=fashion;
-        result.stock=stock;
-
+        [result.metal, result.fashion, result.stock] = await Promise.all([this.getItemDetails('metal', id), this.getItemDetails('fashion', id), this.getItemDetails('stock', id)]);
         result.gold_details = await Promise.all(result.gold_details.map(async item => {
             let price = 0;
             price = (item.weight * 0.77 * 5000)/0.995;
             let details = this.getGoldCosting(item, price);
             return details;
         }));
-
         return result;
     }
 
-    async getMetals(id){
-        var i,x;
-        let metal = []
-        let metals = await utilsDB.getMetals(id);
-        //console.log(JSON.parse(JSON.stringify(metals)))
-        for (i in JSON.parse(JSON.stringify(metals))){
-        x = metal.push(JSON.parse(JSON.stringify(metals))[i].metal);              
-        }      
-        return metal;
-    }
-
-    async getFashion(id){
-        var i,x;
-        let fashion = [];
-        let fashions = await utilsDB.getFashion(id)
-        for (i in JSON.parse(JSON.stringify(fashions))){
-            x = fashion.push(JSON.parse(JSON.stringify(fashions))[i].fashion)
-        }        
-        return fashion;
-    }
-
-    async getStock(id){
-        var i,x;
-        let stock = []
-        let stocks = await utilsDB.getStock(id)
-        for (i in JSON.parse(JSON.stringify(stocks))){
-            x = stock.push(JSON.parse(JSON.stringify(stocks))[i])
-        }        
-        return stocks;
+    async getItemDetails(details, id){
+        let table = {
+            'metal': 'item_category',
+            'fashion': 'fashion_category',
+            'stock': 'stocks'
+        }
+        let select = (details && details == 'stock')?'*':details;
+        let detail = await utilsDB.getItemDetails(select, table, details, id);
+        detail = detail && detail.map(item => {
+            return item[details] || item;
+        }) || null;
+        return detail;
     }
 
     async getPrice(id,quality,color,size){
@@ -117,13 +86,13 @@ class Utils{
     }
 
     getGoldRates(result,size){
-        var i,x = 0;
-        for (i in result){
-            if(result[i].size == size){
-                x = i;
+        let arr = result.filter(item => {
+            if (item.size == size) {
+                return true;
             }
-        }
-        return (result[x].price)
+            return false;
+        });
+        return arr[0] && arr[0].price || result[0].price;
     }
 
     purifyItems(body) {
