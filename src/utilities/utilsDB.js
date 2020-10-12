@@ -47,5 +47,11 @@ class UtilsDB{
         let result = await mysql.query(sql);
         return (result[0].length ? result[0][0].price : null);
     }
+
+    async getGoldPrice(id,size){
+        var sql = `Select gold_details from items where id = "${id}"`
+        let result = await mysql.query(sql);
+        return (result[0].length ? result[0][0].price : null);
+    }
 }
 module.exports = UtilsDB;

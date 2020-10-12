@@ -36,7 +36,8 @@ class Endpoint{
         let id = req.body.item_id;
         let quality = req.body.d_quality;
         let color = req.body.d_color;
-        let result = utils.getPrice(id,quality,color);
+        let size = req.body.size;
+        let result = utils.getPrice(id,quality,color,size);
         return result;
     }
 }
