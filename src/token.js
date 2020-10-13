@@ -5,7 +5,7 @@ const auth = new Auth();
 class Token{
      getToken(body){
         var result = auth.sendToken(body);
-        return result;
+        return Buffer.from(result).toString('base64');
     }
 }
 module.exports = Token;

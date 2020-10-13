@@ -77,24 +77,20 @@ class AuthUtilities{
             var mail = body.email;
             var time = new Date().getTime() + 7200000 
             var cacheTime = new Date().getTime() + 2592000000
-            var token = {
+            var token = JSON.stringify({
                 email:mail,
                 key:time
-                };
+                });
             // token = JSON.stringify(token);
             // token = this.encrypt(token);
-            var cacheToken = {
+            var cacheToken = JSON.stringify({
                 email:mail,
                 key:cacheTime
-            }
-            var result = {
-                token:token,
-                cacheToken : cacheToken
-            }
-            result = JSON.stringify(result);
-            result = this.encrypt(result);
-            console.log(this.decrypt(result))
-            return result;
+            });
+            return JSON.stringify({
+                token:this.encrypt(token),
+                cacheToken : this.encrypt(cacheToken)
+            });
         }
 }
 module.exports = AuthUtilities; 

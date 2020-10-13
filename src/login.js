@@ -57,18 +57,16 @@ class Login{
         //     password:"Shreyasbaf"
         // }
          let encryptedBody = req.headers.login; 
-         console.log(encryptedBody);    
          let userBodyStr = Buffer.from(encryptedBody,'base64').toString();      
          let userBody = JSON.parse(userBodyStr);
-         console.log(userBody);
-        let validate = this.validLoginBody(userBody);//Validate Login Body
+        let validate = this.validLoginBody(userBody); //Validate Login Body
         if(!validate) {
             res.send("Error");
         }
-        let loginCheck = await auth.loginCheck(userBody);//Check Login Body Password
+        let loginCheck = await auth.loginCheck(userBody); //Check Login Body Password
         if(loginCheck == true){
             if(await auth.verifiedUser(userBody)){
-            return token.getToken(userBody)
+            return token.getToken(userBody);
             }else{
                 await this.resend({
                     headers:{
