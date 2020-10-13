@@ -1,4 +1,3 @@
-let { resolve } = require('url');
 let mysql = require('mysql-promise')();
 const bcrypt = require('bcrypt');
 
@@ -13,7 +12,13 @@ class AuthDB {
   }
   async insertNewUser(body, otp) {
     await bcrypt.genSalt(10, async function(err, salt) {
-      await bcrypt.hash(body.password, salt, async function(err, hash) {
+      if (err) {
+        throw err;
+      }
+      await bcrypt.hash(body.password, salt, async function(error, hash) {
+        if (error) {
+          throw error;
+        }
         let sql = `INSERT INTO users(name,email,phone,password,secret,verified,otp) VALUES ("${body.name}","${body.email}","${body.phone}","${hash}",${10},${0},"${otp}")`;
         await mysql.query(sql);
       });
@@ -58,14 +63,14 @@ class AuthDB {
 
   async addOtp(email, otp) {
     let sql = `INSERT INTO unverified_users(email,otp) VALUES ("${email}","${otp}")`;
-    let res = await mysql.query(sql);
+    await mysql.query(sql);
     return true;
   }
 
   async resend(body, otp) {
     if (this.loginUser(body)) {
       let sql = `update users set otp = "${otp}" where email = "${body.email}" `;
-      let res = await mysql.query(sql);
+      await mysql.query(sql);
       return true;
     }
     return false;

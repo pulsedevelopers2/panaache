@@ -1,17 +1,12 @@
 let express = require('express');
 let app = express();
-let { sendMail } = require('./src/sendmail');
 let { sendOtp } = require('./src/otpTry');
 const Login = require('./src/login');
-const Token = require('./src/token');
 const Endpoint = require('./src/endpoint');
-const Utils = require('./src/utilities/utils');
 const bodyParser = require('body-parser');
 const Cors = require('cors');
 const endpoint = new Endpoint();
-const token = new Token();
 const login = new Login();
-const utils = new Utils();
 app.use(Cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 let jsonParser = bodyParser.json();
@@ -48,16 +43,12 @@ app.post('/login', async function(req, res) {
 });
 
 app.post('/forgot', function(req, res) {
-  // let otp = Math.floor(1000+(9999-1000)*Math.random());
-  // let result = sendMail('shreyas7bafna@gmail.com',otp);
-  let result = sendOtp();
+  let result = sendOtp(req);
   res.send(result);
 });
 
 app.post('/getitems/:category', async function(req, res) {
   let result = await endpoint.getItems(req, res, req.params.category);
-  // res.append('Access-Control-Expose-Headers','items,token,error')
-  // res.append('items',result);
   res.send(result);
 });
 

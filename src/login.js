@@ -6,7 +6,7 @@ const token = new Token();
 const auth = new Auth();
 
 class Login {
-  async signUp(req, res) {
+  async signUp(req) {
     let encryptedBody = req.headers.signup;
     let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
     let userBody = JSON.parse(userBodyStr);
@@ -17,8 +17,8 @@ class Login {
     let emailauth = await auth.emailCheck(userBody);// call AuthUtilities EmailCheck
     if (emailauth === null) {
       let otp = await Math.floor(1000 + (9999 - 1000) * Math.random());
-      let result = await auth.addNewUser(userBody, otp);// Add User
-      let verified = await sendMail(userBody.email, otp);
+      await auth.addNewUser(userBody, otp);// Add User
+      await sendMail(userBody.email, otp);
       return 'otpSent';
     }
     return 'userExist';
@@ -36,13 +36,13 @@ class Login {
     }
     return token.getToken(userBody, req.headers);
   }
-  async resend(req, res) {
+  async resend(req) {
     let encryptedBody = req.headers.resendotp;
     let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
     let userBody = JSON.parse(userBodyStr);
     let otp = await Math.floor(1000 + (9999 - 1000) * Math.random());
-    let result = await auth.resendOtp(userBody, otp);
-    let verified = await sendMail(userBody.email, otp);
+    await auth.resendOtp(userBody, otp);
+    await sendMail(userBody.email, otp);
     return true;
   }
 
@@ -69,13 +69,6 @@ class Login {
     res.append('error', 'failed');
     return 'failed';
   }
-
-  async forgotPassword(req, res) { // Forgot Password Pending
-    let time = new Date().getTime() + 7200000;
-    console.log(time);
-    return time;
-  }
-
   validUserBody(userBody) {
     if (!(userBody.name && userBody.email && userBody.phone && userBody.password)) {
       return false;
@@ -103,23 +96,23 @@ class Login {
   //     result = await this.verifyToken(token);
   //     return result;
   // }
-  verifyToken(token) {
-    if (token.key >= Date().getTime()) {
+  verifyToken(user_token) {
+    if (user_token.key >= Date().getTime()) {
       return true;
     }
     return false;
   }
 
-  getLoginToken(req, res) {
+  getLoginToken(req) {
     try {
       let encryptedToken = req.headers.token;
       let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();
       let userToken = JSON.parse(userTokenStr);
       let parser = auth.createKey(req.headers);
-      let token = userToken.token && JSON.parse(auth.decrypt(userToken.token, parser)) || { key: 0 };
+      let user_token = userToken.token && JSON.parse(auth.decrypt(userToken.token, parser)) || { key: 0 };
       let cacheToken = userToken.cacheToken && JSON.parse(auth.decrypt(userToken.cacheToken, parser)) || { key: 0 };
       let currentTime = new Date().getTime();
-      if (token.key >= currentTime || cacheToken.key >= currentTime) {
+      if (user_token.key >= currentTime || cacheToken.key >= currentTime) {
         return true;
       }
       return false;

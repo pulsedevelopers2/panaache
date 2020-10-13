@@ -71,7 +71,7 @@ class AuthUtilities {
     // var passwd = this.decrypt(body.password)
     let otp = msg.toString();
     otp = this.encrypt(otp);
-    let result = await authDB.resend(body, otp);
+    await authDB.resend(body, otp);
     return true;
   }
 
