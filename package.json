@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon apireq.js"
+    "start": "nodemon apireq.js",
+    "lint": "eslint \"./**/*.js\" \"./*.js\""
   },
   "author": "Pulse",
   "license": "ISC",
@@ -19,6 +20,10 @@
     "body-parser":"^1.19.0"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "eslint": "^7.11.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-mocha": "^8.0.0",
+    "eslint-plugin-promise": "^4.2.1"
   }
 }
