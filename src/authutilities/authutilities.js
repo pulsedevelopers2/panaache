@@ -6,13 +6,13 @@ const authDB = new AuthDB();
 
 class AuthUtilities {
   encrypt(text, key = 'panaache') {
-    let mykey = crypto.createCipheriv('aes-128-cbc', key);
+    let mykey = crypto.createCipher('aes-128-cbc', key);
     let mystr = mykey.update(text, 'utf8', 'hex');
     mystr += mykey.final('hex');
     return mystr;
   }
   decrypt(text, key = 'panaache') {
-    let mykey = crypto.createDecipheriv('aes-128-cbc', key);
+    let mykey = crypto.createDecipher('aes-128-cbc', key);
     let mystr = mykey.update(text, 'hex', 'utf8');
     mystr += mykey.final('utf8');
     return mystr;
@@ -54,7 +54,7 @@ class AuthUtilities {
 
   async verifiedUser(body) {
     let result = await authDB.getUser(body.email);
-    if (result && result.verified === '1') {
+    if (result && result.verified === 1) {
       return true;
     }
     return false;
@@ -89,7 +89,8 @@ class AuthUtilities {
     });
     return JSON.stringify({
       token: this.encrypt(token, parser),
-      cacheToken: this.encrypt(cacheToken, parser)
+      cacheToken: this.encrypt(cacheToken, parser),
+      email: body.email
     });
   }
 }

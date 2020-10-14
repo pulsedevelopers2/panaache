@@ -88,32 +88,20 @@ class Login {
     }
     return true;
   }
-  // async validateToken(req_token){
-  //     let encryptedToken = req_token
-  //     let userTokenStr = Buffer.from(encryptedToken,'base64').toString();
-  //     token = auth.decrypt(userTokenStr);
-  //     token = JSON.parse(token);
-  //     result = await this.verifyToken(token);
-  //     return result;
-  // }
-  verifyToken(user_token) {
-    if (user_token.key >= Date().getTime()) {
-      return true;
-    }
-    return false;
-  }
 
-  getLoginToken(req) {
+  verifyToken(req,key='token') {
     try {
-      let encryptedToken = req.headers.token;
-      let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();
+      let encryptedToken = req.headers[key];
+      let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();      
       let userToken = JSON.parse(userTokenStr);
       let parser = auth.createKey(req.headers);
       let user_token = userToken.token && JSON.parse(auth.decrypt(userToken.token, parser)) || { key: 0 };
       let cacheToken = userToken.cacheToken && JSON.parse(auth.decrypt(userToken.cacheToken, parser)) || { key: 0 };
       let currentTime = new Date().getTime();
       if (user_token.key >= currentTime || cacheToken.key >= currentTime) {
-        return true;
+        return Buffer.from(JSON.stringify({
+          email: user_token.email || cacheToken.email
+        })).toString('base64');
       }
       return false;
     } catch (e) {

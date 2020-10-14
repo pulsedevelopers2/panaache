@@ -23,6 +23,17 @@ class UtilsDB {
     return (res[0].length ? res[0][0] : null);
   }
 
+  async getSizes(category){
+    let sql = `select sizes from category where category_name = "${category.toLowerCase()}"`
+    let res = await mysql.query(sql);
+    return (res[0].length ? res[0][0] : null);
+  }
+
+  async getQualityColor(){
+    let sql = `select concat(d_quality.quality," ",d_color.color) as qc FROM d_quality join d_color`
+    let res = await mysql.query(sql);
+    return (res[0].length ? res[0] : null);
+  }
   async getItemDetails(select, table, detail, id) {
     let sql = `Select ${select} from ${table[detail] || detail} where id = "${id}"`;
     let res = await mysql.query(sql);
