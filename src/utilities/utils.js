@@ -9,18 +9,18 @@ class Utils {
     
   async getItem(id) {
     let result = await utilsDB.getItem(id);
-    let size = await utilsDB.getSizes(result.category);
-    let qc = await utilsDB.getQualityColor();
+    let [size, qualities, color] = await Promise.all([utilsDB.getSizes(result.category), utilsDB.getDquality(), utilsDB.getDcolor()]);
     result.sizes = JSON.parse(size.sizes);
-    result.combination =qc;
+    result.dqualities = qualities.map(item => {return item.quality;});
+    result.dcolors = color.map(item => {return item.color;});
     result = this.purifyItems([result])[0];
     [result.metal, result.fashion, result.stock] = await Promise.all([this.getItemDetails('metal', id), this.getItemDetails('fashion', id), this.getItemDetails('stock', id)]);
-    result.gold_details = await Promise.all(result.gold_details.map(item => {
+    result.gold_details = result.gold_details.map(item => {
       let price = 0;
       price = (item.weight * 0.77 * 5000) / 0.995;
       let details = this.getGoldCosting(item, price);
       return details;
-    }));
+    });
     return result;
   }
 
@@ -105,7 +105,7 @@ class Utils {
       item_temp.image_link = JSON.parse(item_temp.image_link);
       item_temp.item_details = JSON.parse(item_temp.item_details);
       item_temp.gold_details = JSON.parse(item_temp.gold_details);
-      //console.log(item_temp.combination)
+      // console.log(item_temp.combination)
       newBody.push(item_temp);
     });
     return newBody;

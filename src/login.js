@@ -89,10 +89,10 @@ class Login {
     return true;
   }
 
-  verifyToken(req,key='token') {
+  verifyToken(req, key = 'token') {
     try {
       let encryptedToken = req.headers[key];
-      let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();      
+      let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();
       let userToken = JSON.parse(userTokenStr);
       let parser = auth.createKey(req.headers);
       let user_token = userToken.token && JSON.parse(auth.decrypt(userToken.token, parser)) || { key: 0 };

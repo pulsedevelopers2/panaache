@@ -6,6 +6,7 @@ const authDB = new AuthDB();
 
 class AuthUtilities {
   encrypt(text, key = 'panaache') {
+    /* eslint-disable node/no-deprecated-api */
     let mykey = crypto.createCipher('aes-128-cbc', key);
     let mystr = mykey.update(text, 'utf8', 'hex');
     mystr += mykey.final('hex');
@@ -13,6 +14,7 @@ class AuthUtilities {
   }
   decrypt(text, key = 'panaache') {
     let mykey = crypto.createDecipher('aes-128-cbc', key);
+    /* eslint-enable node/no-deprecated-api */
     let mystr = mykey.update(text, 'hex', 'utf8');
     mystr += mykey.final('utf8');
     return mystr;
