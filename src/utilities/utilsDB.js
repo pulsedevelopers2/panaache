@@ -50,5 +50,12 @@ class UtilsDB {
     let result = await mysql.query(sql);
     return (result[0].length ? result[0][0].price : null);
   }
+
+  async addToCart(userBody,email){
+    console.log(userBody)
+    let sql = `insert into users_cart(item_id,user_email,quantity,quality,color,size,metal) values ("${userBody.item_id}","${email}",${userBody.quantity},"${userBody.quality}","${userBody.color}",${userBody.size},"${userBody.metal}") `
+    let result = await mysql.query(sql);
+    return result;
+  }
 }
 module.exports = UtilsDB;

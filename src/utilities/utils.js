@@ -10,7 +10,7 @@ class Utils {
   async getItem(id) {
     let result = await utilsDB.getItem(id);
     let [size, qualities, color] = await Promise.all([utilsDB.getSizes(result.category), utilsDB.getDquality(), utilsDB.getDcolor()]);
-    result.sizes = JSON.parse(size.sizes);
+    result.sizes = size.sizes;
     result.dqualities = qualities.map(item => {return item.quality;});
     result.dcolors = color.map(item => {return item.color;});
     result = this.purifyItems([result])[0];
@@ -109,6 +109,16 @@ class Utils {
       newBody.push(item_temp);
     });
     return newBody;
+  }
+
+  async addToCart(req,email){
+    let encryptedBody = req.headers.cart;
+    console.log(encryptedBody);
+    let userBody = JSON.parse(encryptedBody);
+    // let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
+    // let userBody = JSON.parse(userBodyStr);
+    let result = await utilsDB.addToCart(userBody,email)
+    return 'Success';
   }
 }
 module.exports = Utils;

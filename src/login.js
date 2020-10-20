@@ -97,6 +97,7 @@ class Login {
       let parser = auth.createKey(req.headers);
       let user_token = userToken.token && JSON.parse(auth.decrypt(userToken.token, parser)) || { key: 0 };
       let cacheToken = userToken.cacheToken && JSON.parse(auth.decrypt(userToken.cacheToken, parser)) || { key: 0 };
+      //console.log(user_token.email || cacheToken.email)
       let currentTime = new Date().getTime();
       if (user_token.key >= currentTime || cacheToken.key >= currentTime) {
         return Buffer.from(JSON.stringify({

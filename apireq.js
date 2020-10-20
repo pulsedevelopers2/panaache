@@ -96,4 +96,17 @@ app.post('/pricing', jsonParser, async function(req, res) {
   res.send(result);
   // res.send(req.body)
 });
+
+app.post('/addtocart', async function (req,res){
+ // let email = await login.verifyToken(req);
+  let email = 'sandesh.bafna8@gmail.com'
+  let result = 'error'
+  if(email){
+     result = await endpoint.addToCart(req,email);
+  } else {
+    res.append('Access-Control-Expose-Headers', 'token');
+    res.append('token', 'error');
+  }
+  res.send(result);
+})
 app.listen(8080);

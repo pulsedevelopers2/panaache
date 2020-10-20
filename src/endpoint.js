@@ -20,5 +20,10 @@ class Endpoint {
     let result = await utils.getPrice(id, quality, color, size);
     return result;
   }
+
+  async addToCart(req,email){
+    let result = await utils.addToCart(req,email);
+    return result;
+  }
 }
 module.exports = Endpoint;
