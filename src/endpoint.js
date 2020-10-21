@@ -25,5 +25,10 @@ class Endpoint {
     let result = await utils.addToCart(req,email);
     return result;
   }
+
+  async viewCart(req,email){
+    let result = await utils.viewCart(req,email);
+    return result;
+  }
 }
 module.exports = Endpoint;

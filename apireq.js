@@ -98,8 +98,7 @@ app.post('/pricing', jsonParser, async function(req, res) {
 });
 
 app.post('/addtocart', async function (req,res){
- // let email = await login.verifyToken(req);
-  let email = 'sandesh.bafna8@gmail.com'
+  let email = await login.verifyToken(req);
   let result = 'error'
   if(email){
      result = await endpoint.addToCart(req,email);
@@ -108,5 +107,30 @@ app.post('/addtocart', async function (req,res){
     res.append('token', 'error');
   }
   res.send(result);
-})
+});
+
+app.post('/viewcart', async function (req,res){
+  let email = await login.verifyToken(req);
+  let result = 'error'
+  if(email){
+     result = await endpoint.viewCart(req,email);
+  } else {
+    res.append('Access-Control-Expose-Headers', 'token');
+    res.append('token', 'error');
+  }
+  res.send(result);
+});
+
+app.post('/viewcart1', async function (req,res){
+  let email = 'sandesh.bafna8@gmail.com'//await login.verifyToken(req);
+  console.log(email)
+  let result = 'error'
+  if(email){
+    result = await endpoint.viewCart(req,email) ;
+  } else {
+    res.append('Access-Control-Expose-Headers', 'token');
+    res.append('token', 'error');
+  }
+  res.send(result);
+});
 app.listen(8080);

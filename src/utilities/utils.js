@@ -8,6 +8,8 @@ class Utils {
   }
     
   async getItem(id) {
+    let liveRate = await utilsDB.getGoldLiveRate();
+    console.log(liveRate)    
     let result = await utilsDB.getItem(id);
     let [size, qualities, color] = await Promise.all([utilsDB.getSizes(result.category), utilsDB.getDquality(), utilsDB.getDcolor()]);
     result.sizes = size.sizes;
@@ -17,7 +19,7 @@ class Utils {
     [result.metal, result.fashion, result.stock] = await Promise.all([this.getItemDetails('metal', id), this.getItemDetails('fashion', id), this.getItemDetails('stock', id)]);
     result.gold_details = result.gold_details.map(item => {
       let price = 0;
-      price = (item.weight * 0.77 * 5000) / 0.995;
+      price = (item.weight * 0.77 * liveRate) / 0.995;
       let details = this.getGoldCosting(item, price);
       return details;
     });
@@ -39,6 +41,7 @@ class Utils {
   }
 
   async getPrice(id, quality, color, size) {
+    let liveRate = await utilsDB.getGoldLiveRate();
     let diamond_cost = 0;
     let result = this.purifyItems([await utilsDB.getItem(id)])[0];
 
@@ -54,10 +57,10 @@ class Utils {
       diamond_cost = diamond_cost + details.price;
       return details;
     }));
-
+    
     result.gold_details = await Promise.all(result.gold_details && result.gold_details.map(item => {
       let price = 0;
-      price = (item.weight * 0.77 * 5000) / 0.995;
+      price = (item.weight * 0.77 * liveRate) / 0.995;
       let details = this.getGoldCosting(item, price);
       return details;
     }) || []);
@@ -73,6 +76,8 @@ class Utils {
     result.gst = gst;
     result.total_cost = Math.round(total_cost);
     result.gold_weight = gold_rates.weight;
+    //console.log('here')
+    //console.log(result.total_cost)
     return result;
   }
 
@@ -113,12 +118,25 @@ class Utils {
 
   async addToCart(req,email){
     let encryptedBody = req.headers.cart;
-    console.log(encryptedBody);
-    let userBody = JSON.parse(encryptedBody);
-    // let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
-    // let userBody = JSON.parse(userBodyStr);
+    let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
+    let userBody = JSON.parse(userBodyStr);
     let result = await utilsDB.addToCart(userBody,email)
     return 'Success';
+  }
+
+  async viewCart(req,email){
+    let result = await utilsDB.viewCart(req,email);
+    result = await this.getCartPrice(result);
+    return result;
+  }
+
+  async getCartPrice(result){
+      result = await Promise.all(result.map(async item =>{
+      let price = await this.getPrice(item.item_id,item.quality,item.color,item.size);
+      item.finalPrice = price.total_cost*item.quantity
+      return item;
+    }))
+    return result
   }
 }
 module.exports = Utils;
