@@ -9,7 +9,6 @@ class Utils {
     
   async getItem(id) {
     let liveRate = await utilsDB.getGoldLiveRate();
-    console.log(liveRate)    
     let result = await utilsDB.getItem(id);
     let [size, qualities, color] = await Promise.all([utilsDB.getSizes(result.category), utilsDB.getDquality(), utilsDB.getDcolor()]);
     result.sizes = size.sizes;
@@ -76,8 +75,6 @@ class Utils {
     result.gst = gst;
     result.total_cost = Math.round(total_cost);
     result.gold_weight = gold_rates.weight;
-    //console.log('here')
-    //console.log(result.total_cost)
     return result;
   }
 
@@ -110,33 +107,32 @@ class Utils {
       item_temp.image_link = JSON.parse(item_temp.image_link);
       item_temp.item_details = JSON.parse(item_temp.item_details);
       item_temp.gold_details = JSON.parse(item_temp.gold_details);
-      // console.log(item_temp.combination)
       newBody.push(item_temp);
     });
     return newBody;
   }
 
-  async addToCart(req,email){
+  async addToCart(req, email) {
     let encryptedBody = req.headers.cart;
     let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
     let userBody = JSON.parse(userBodyStr);
-    let result = await utilsDB.addToCart(userBody,email)
+    await utilsDB.addToCart(userBody, email);
     return 'Success';
   }
 
-  async viewCart(req,email){
-    let result = await utilsDB.viewCart(req,email);
+  async viewCart(req, email) {
+    let result = await utilsDB.viewCart(req, email);
     result = await this.getCartPrice(result);
     return result;
   }
 
-  async getCartPrice(result){
-      result = await Promise.all(result.map(async item =>{
-      let price = await this.getPrice(item.item_id,item.quality,item.color,item.size);
-      item.finalPrice = price.total_cost*item.quantity
+  async getCartPrice(result) {
+    let tempResult = await Promise.all(result.map(async item => {
+      let price = await this.getPrice(item.item_id, item.quality, item.color, item.size);
+      item.finalPrice = price.total_cost * item.quantity;
       return item;
-    }))
-    return result
+    }));
+    return tempResult;
   }
 }
 module.exports = Utils;

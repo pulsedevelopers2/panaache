@@ -1,6 +1,6 @@
 let crypto = require('crypto');
 const AuthDB = require('./authDB');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 const authDB = new AuthDB();
 

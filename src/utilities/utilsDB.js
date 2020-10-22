@@ -51,22 +51,22 @@ class UtilsDB {
     return (result[0].length ? result[0][0].price : null);
   }
 
-  async getGoldLiveRate(){
-    let sql = `Select rate from gold_rate where id = 12321`;
+  async getGoldLiveRate() {
+    let sql = 'Select rate from gold_rate where id = 12321';
     let result = await mysql.query(sql);
     return (result[0].length ? result[0][0].rate : null);
   }
 
-  async addToCart(userBody,email){
-    let sql = `insert into users_cart(item_id,user_email,quantity,quality,color,size,metal) values ("${userBody.item_id}","${email}",${userBody.quantity},"${userBody.quality}","${userBody.color}",${userBody.size},"${userBody.metal}") `
+  async addToCart(userBody, email) {
+    let sql = `insert into users_cart(item_id,user_email,quantity,quality,color,size,metal) values ("${userBody.item_id}","${email}",${userBody.quantity},"${userBody.quality}","${userBody.color}",${userBody.size},"${userBody.metal}") `;
     let result = await mysql.query(sql);
     return result;
   }
 
-  async viewCart(req,email){
+  async viewCart(req, email) {
     let sql = `select * from users_cart where user_email = "${email}"`;
     let result = await mysql.query(sql);
-    return (result[0].length ? result[0] : null);    
+    return (result[0].length ? result[0] : null);
   }
 }
 module.exports = UtilsDB;

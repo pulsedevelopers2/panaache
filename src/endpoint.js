@@ -21,13 +21,13 @@ class Endpoint {
     return result;
   }
 
-  async addToCart(req,email){
-    let result = await utils.addToCart(req,email);
+  async addToCart(req, email) {
+    let result = await utils.addToCart(req, email);
     return result;
   }
 
-  async viewCart(req,email){
-    let result = await utils.viewCart(req,email);
+  async viewCart(req, email) {
+    let result = await utils.viewCart(req, email);
     return result;
   }
 }

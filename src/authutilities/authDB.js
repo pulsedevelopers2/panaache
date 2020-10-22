@@ -1,5 +1,5 @@
 let mysql = require('mysql-promise')();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 class AuthDB {
   constructor() {
@@ -11,16 +11,19 @@ class AuthDB {
     });
   }
   async insertNewUser(body, otp) {
-    await bcrypt.genSalt(10, async function(err, salt) {
-      if (err) {
-        throw err;
-      }
-      await bcrypt.hash(body.password, salt, async function(error, hash) {
-        if (error) {
-          throw error;
+    await new Promise(resolve => {
+      bcrypt.genSalt(10, async function(err, salt) {
+        if (err) {
+          throw err;
         }
-        let sql = `INSERT INTO users(name,email,phone,password,secret,verified,otp) VALUES ("${body.name}","${body.email}","${body.phone}","${hash}",${10},${0},"${otp}")`;
-        await mysql.query(sql);
+        await bcrypt.hash(body.password, salt, async function(error, hash) {
+          if (error) {
+            throw error;
+          }
+          let sql = `INSERT INTO users(name,email,phone,password,secret,verified,otp) VALUES ("${body.name}","${body.email}","${body.phone}","${hash}",${10},${0},"${otp}")`;
+          await mysql.query(sql);
+          resolve(hash);
+        });
       });
     });
   }

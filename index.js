@@ -1,4 +1,5 @@
 let express = require('express');
+let serverless = require('serverless-http');
 let app = express();
 let { sendOtp } = require('./src/otpTry');
 const Login = require('./src/login');
@@ -138,5 +139,8 @@ app.post('/viewcart1', async function(req, res) {
   }
   res.send(result);
 });
-
-app.listen(8080);
+const handler = serverless(app);
+module.exports.handler = async (event, context) => {
+  const result = await handler(event, context);
+  return result;
+};
