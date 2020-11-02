@@ -4,11 +4,21 @@ let { sendOtp } = require('./src/otpTry');
 const Login = require('./src/login');
 const Endpoint = require('./src/endpoint');
 const Auth = require('./src/authutilities/authutilities');
+const Payment = require('./src/payment/payment')
 const bodyParser = require('body-parser');
 const Cors = require('cors');
 const endpoint = new Endpoint();
 const login = new Login();
 const auth = new Auth();
+const payment = new Payment();
+const https = require('https');
+
+/*
+* import checksum generation utility
+* You can get this utility from https://developer.paytm.com/docs/checksum/
+*/
+const PaytmChecksum = require('paytmchecksum');
+
 app.use(Cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(function(req, res, next) {
@@ -103,7 +113,7 @@ app.post('/pricing', jsonParser, async function(req, res) {
   // res.send(req.body)
 });
 
-app.post('/addtocart', async function(req, res) {
+app.post('/addtocart', jsonParser,async function(req, res) {
   let email = await login.verifyToken(req);
   let result = 'error';
   if (email) {
@@ -139,4 +149,22 @@ app.post('/viewcart1', async function(req, res) {
   res.send(result);
 });
 
+app.post('/createorderpayment',async function(req, res){
+  let result = await endpoint.createOrder();
+  res.send(result)
+})
+
+app.get('/paytmorder',async function(req,res){
+  let result = await payment.PaytmPayment(req,res)
+})
+
+app.post('/callback',async function(req,res){
+  let result = await payment.PaymentCallback(req,res)
+})
+
+app.post('/sendsms',async function(){
+  let result = login.sendOtp();
+})
 app.listen(8080);
+
+
