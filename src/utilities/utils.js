@@ -39,7 +39,14 @@ class Utils {
     return detail;
   }
 
-  async getPrice(id, quality, color, size) {
+  async getPrice(id, quality, color, size,metal='default') {
+    console.log(id, quality, color, size,metal)
+    let purity={
+      "DEFAULT":0.77,
+      "WHITE GOLD":0.77,
+      "ROSE GOLD":0.76,
+      "YELLOW GOLD":0.76
+    }
     let liveRate = await utilsDB.getGoldLiveRate();
     let diamond_cost = 0;
     let result = this.purifyItems([await utilsDB.getItem(id)])[0];
@@ -59,20 +66,21 @@ class Utils {
     
     result.gold_details = await Promise.all(result.gold_details && result.gold_details.map(item => {
       let price = 0;
-      price = (item.weight * 0.77 * liveRate) / 0.995;
+      price = (item.weight * purity[metal.toUpperCase()] * liveRate) / 0.995;
       let details = this.getGoldCosting(item, price);
       return details;
     }) || []);
 
-    let gold_rates = result.gold_details.length && await this.getGoldRates(result.gold_details.length && result.gold_details, size) || { size: 'default', weight: result.gold_wt, price: (result.gold_wt * 0.77 * 5000) / 0.995 };
+    let gold_rates = result.gold_details.length && await this.getGoldRates(result.gold_details.length && result.gold_details, size) || { size: 'default', weight: result.gold_wt, price: (result.gold_wt *  purity[metal.toUpperCase()] * 5000) / 0.995 };
     let gold_rate = gold_rates.price; // result['gold_details'][x].price //(result.gold_wt*0.77*5000)/0.995 //Gold Rates
     let making_charges = gold_rates.weight * 900;
-    let gst = (gold_rate + making_charges + diamond_cost) * 0.03;// gst 3%
-    let total_cost = gold_rate + making_charges + diamond_cost + gst;// total
+    let gst = Math.round((gold_rate + making_charges + diamond_cost) * 0.05);// gst 3%+2% charges
+    //console.log(gst)
+    let total_cost = Math.round(gold_rate*100)/100 + making_charges + diamond_cost + gst;// total
     result.diamond_cost = diamond_cost;
-    result.gold_rate = gold_rate;
+    result.gold_rate = Math.round(gold_rate*100)/100;
     result.making_charges = making_charges;
-    result.gst = gst;
+    result.gst = Math.round(gst);
     result.total_cost = Math.round(total_cost);
     result.gold_weight = gold_rates.weight;
     return result;
@@ -113,7 +121,7 @@ class Utils {
   }
 
   async addToCart(req, email) {
-    let encryptedBody = req.headers.cart;
+    let encryptedBody = req.body.cart;
     let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
     let userBody = JSON.parse(userBodyStr);
     await utilsDB.addToCart(userBody, email);
@@ -128,7 +136,7 @@ class Utils {
 
   async getCartPrice(result) {
     let tempResult = await Promise.all(result.map(async item => {
-      let price = await this.getPrice(item.item_id, item.quality, item.color, item.size);
+      let price = await this.getPrice(item.item_id, item.quality, item.color, item.size,item.metal);
       item.finalPrice = price.total_cost * item.quantity;
       return item;
     }));

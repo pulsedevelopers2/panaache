@@ -11,12 +11,16 @@ class UtilsDB {
     });
   }
     
+  // async getItems(category) {
+  //   let sql = `Select * from items where category = "${category}"`;
+  //   let res = await mysql.query(sql);
+  //   return (res[0].length ? res[0] : null);
+  // }
   async getItems(category) {
-    let sql = `Select * from items where category = "${category}"`;
+    let sql = `Select * from items where id in(select item_id from categories where ${category} = 1)`;
     let res = await mysql.query(sql);
     return (res[0].length ? res[0] : null);
   }
-
   async getItem(id) {
     let sql = `Select * from items where id = "${id}"`;
     let res = await mysql.query(sql);
@@ -59,6 +63,7 @@ class UtilsDB {
 
   async addToCart(userBody, email) {
     let sql = `insert into users_cart(item_id,user_email,quantity,quality,color,size,metal) values ("${userBody.item_id}","${email}",${userBody.quantity},"${userBody.quality}","${userBody.color}",${userBody.size},"${userBody.metal}") `;
+    console.log(sql)
     let result = await mysql.query(sql);
     return result;
   }

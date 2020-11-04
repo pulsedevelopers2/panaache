@@ -1,10 +1,11 @@
 const Utils = require('./utilities/utils');
-const Razorpay = require('razorpay')
+const Razorpay = require('razorpay');
+const crypto = require('crypto')
 
 const utils = new Utils();
 const instance = new Razorpay({
-  key_id:"rzp_test_ysLINZgR8PucKz",
-  key_secret:"RgkMbsYs1CsPAxI5TCxgOugQ"
+  key_id:"rzp_test_lTEoCEehuqOkFf",
+  key_secret:"dZpYLxagmZzczoCj1zfq7ffV"
 })
 
 class Endpoint {
@@ -37,9 +38,14 @@ class Endpoint {
     return result;
   }
 
-  async createOrder(){
+  async createOrder(req,email){
+    let result = await utils.viewCart(req, email);
+    let finalPrice = 0;
+    result.forEach(item => {
+      finalPrice = finalPrice + item.finalPrice;
+    });
     var options = {
-      amount: 50000,  // amount in the smallest currency unit
+      amount: finalPrice*100,  // amount in the smallest currency unit
       currency: "INR",
       receipt: "order_rcptid_11"
     };
@@ -47,6 +53,18 @@ class Endpoint {
       console.log(data);
       return data;
     })
+  }
+
+  verifySignature(signature){
+   // generated_signature = hmac_sha256("order_FwijfvXHIfEkCZ" + "|" + "pay_Fwil7e6NZcZGgl", "dZpYLxagmZzczoCj1zfq7ffV");  
+    let generated_signature = crypto.createHmac('sha256',instance.key_secret).update(signature.razorpay_order_id + "|" +signature.razorpay_payment_id).digest('hex');
+    if (generated_signature == signature.razorpay_signature) {
+      return "success";  
+    }
+    else{
+      return "failure";
+    }
+    return "failure";
   }
 
 }

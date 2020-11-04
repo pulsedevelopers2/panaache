@@ -12,8 +12,6 @@ class Payment {
             website: "WEBSTAGING"
 		}
 console.log('Payment Initiate')
-        
-
 var paytmParams = {};
 
 paytmParams.body = {

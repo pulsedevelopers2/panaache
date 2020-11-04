@@ -1,7 +1,7 @@
 const Auth = require('./authutilities/authutilities');
 const Token = require('./token');
 let { sendMail } = require('./sendmail');
-
+var unirest = require("unirest");
 const token = new Token();
 const auth = new Auth();
 
@@ -88,7 +88,7 @@ class Login {
     return true;
   }
 
-  verifyToken(req, key = 'token') {
+  verifyToken(req, key = 'token',encrypt = true) {
     try {
       let encryptedToken = req.headers[key];
       let userTokenStr = Buffer.from(encryptedToken, 'base64').toString();
@@ -98,15 +98,43 @@ class Login {
       let cacheToken = userToken.cacheToken && JSON.parse(auth.decrypt(userToken.cacheToken, parser)) || { key: 0 };
       let currentTime = new Date().getTime();
       if (user_token.key >= currentTime || cacheToken.key >= currentTime) {
+        if(encrypt){
         return Buffer.from(JSON.stringify({
           email: user_token.email || cacheToken.email
         })).toString('base64');
+      }else{
+        return user_token.email || cacheToken.email;
+      }
       }
       return false;
     } catch (e) {
       console.log(e);
       return false;
     }
+  }
+
+  sendOtp(){
+
+    var req = unirest("POST", "https://www.fast2sms.com/dev/bulk");
+    
+    req.headers({
+      "authorization": "nBRi3axEMFNIjXLKUgdY6Wsoze1OAy5VCqDSfhlJu4tpHkPcZvQesTza9yJ7tqgXFwr0EfVGoBP5CAU2"
+    });
+    
+    req.form({
+      "sender_id": "FSTSMS",
+      "message": "This is a test message",
+      "language": "english",
+      "route": "p",
+      "numbers": "9482270351",
+    });
+    
+    req.end(function (res) {
+      if (res.error) throw new Error(res.error);
+    
+      console.log(res.body);
+    });
+
   }
 }
 module.exports = Login;
