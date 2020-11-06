@@ -40,7 +40,6 @@ class Utils {
   }
 
   async getPrice(id, quality, color, size,metal='default') {
-    console.log(id, quality, color, size,metal)
     let purity={
       "DEFAULT":0.77,
       "WHITE GOLD":0.77,
@@ -75,7 +74,6 @@ class Utils {
     let gold_rate = gold_rates.price; // result['gold_details'][x].price //(result.gold_wt*0.77*5000)/0.995 //Gold Rates
     let making_charges = gold_rates.weight * 900;
     let gst = Math.round((gold_rate + making_charges + diamond_cost) * 0.05);// gst 3%+2% charges
-    //console.log(gst)
     let total_cost = Math.round(gold_rate*100)/100 + making_charges + diamond_cost + gst;// total
     result.diamond_cost = diamond_cost;
     result.gold_rate = Math.round(gold_rate*100)/100;
@@ -120,6 +118,21 @@ class Utils {
     return newBody;
   }
 
+  purifyCart(body) {
+    let newBody = [];
+    body.forEach(item => {
+      let item_temp = item;
+      item_temp.image_link = JSON.parse(item_temp.image_link);
+      newBody.push(item_temp);
+    });
+    return newBody;
+  }
+
+  async removeItem(id,email){
+    let result = await utilsDB.removeItem(id,email);
+    return result;
+  }
+
   async addToCart(req, email) {
     let encryptedBody = req.body.cart;
     let userBodyStr = Buffer.from(encryptedBody, 'base64').toString();
@@ -128,9 +141,10 @@ class Utils {
     return 'Success';
   }
 
-  async viewCart(req, email) {
-    let result = await utilsDB.viewCart(req, email);
+  async viewCart(email) {
+    let result = await utilsDB.viewCart(email);
     result = await this.getCartPrice(result);
+    result = await this.purifyCart(result);
     return result;
   }
 

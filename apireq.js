@@ -144,7 +144,7 @@ app.post('/addtocart', jsonParser,async function(req, res) {
 });
 
 app.post('/viewcart', async function(req, res) {
-  let email = await login.verifyToken(req);
+  let email = await login.verifyToken(req ,'token',false);
   let result = 'error';
   if (email) {
     result = await endpoint.viewCart(req, email);
@@ -154,6 +154,20 @@ app.post('/viewcart', async function(req, res) {
   }
   res.send(result);
 });
+
+app.post('/remove/:id',async function(req,res){
+  //let email = await login.verifyToken(req,'token',false)
+  email = "sandesh.bafna8@gmail.com"
+  console.log(email);
+  let result = 'error';
+  if(email){
+    result = await endpoint.removeItem(req.params.id,email);
+  } else {
+    res.append('Access-Control-Expose-Headers', 'token');
+    res.append('token', 'error');
+  }
+  res.send(result);
+})
 
 app.post('/viewcart1', async function(req, res) {
   let email = 'sandesh.bafna8@gmail.com';// await login.verifyToken(req);
@@ -166,6 +180,8 @@ app.post('/viewcart1', async function(req, res) {
   }
   res.send(result);
 });
+
+
 
 app.post('/placeorder',async function(req, res){
   email = "sandesh.bafna8@gmail.com"
@@ -192,7 +208,7 @@ app.post('/sendsms',async function(){
   let result = login.sendOtp();
 })
 
-app.post('/paynow', [parseUrl, parseJson], (req, res) => {
+app.get('/paynow', [parseUrl, parseJson], (req, res) => {
     var params = {};
     params['MID'] = config.PaytmConfig.mid;
     params['WEBSITE'] = config.PaytmConfig.website;
@@ -201,10 +217,9 @@ app.post('/paynow', [parseUrl, parseJson], (req, res) => {
     params['ORDER_ID'] = 'TEST_' + new Date().getTime();
     params['CUST_ID'] = 'customer_001';
     params['TXN_AMOUNT'] = "2151.00"//req.body.amount.toString();
-    params['CALLBACK_URL'] = 'http://localhost:8080/callback';
+    params['CALLBACK_URL'] = "http://192.168.43.119:1024/";
     params['EMAIL'] = "shreyas7bafna@gmail.com"//req.body.email;
     params['MOBILE_NO'] ="9611466394" //req.body.phone.toString();
-
 
     checksum_lib.genchecksum(params, config.PaytmConfig.key, function (err, checksum) {
       var txn_url = "https://securegw-stage.paytm.in/theia/processTransaction"; // for staging
@@ -215,13 +230,13 @@ app.post('/paynow', [parseUrl, parseJson], (req, res) => {
         form_fields += "<input type='hidden' name='" + x + "' value='" + params[x] + "' >";
       }
       form_fields += "<input type='hidden' name='CHECKSUMHASH' value='" + checksum + "' >";
-
+      console.log(checksum);
       res.writeHead(200, { 'Content-Type': 'text/html' });
-      res.write('<html><head><title>Merchant Checkout Page</title></head><body><center><h1>Please do not refresh this page...</h1></center><form method="post" action="' + txn_url + '" name="f1">' + form_fields + '</form><script type="text/javascript">document.f1.submit();</script></body></html>');
+      //res.write('<form method="post" id="f1" action="' + txn_url + '" name="f1">' + form_fields + '</form>');
+      res.write('<form method="post" id = "f1" action="' + txn_url + '" name="f1">' + form_fields + '</form><script type="text/javascript">document.f1.submit();</script>');
       res.end();
     });
 })
-
 
 app.post('/callback', (req, res) => {
   var body = '';

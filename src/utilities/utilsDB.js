@@ -16,11 +16,20 @@ class UtilsDB {
   //   let res = await mysql.query(sql);
   //   return (res[0].length ? res[0] : null);
   // }
+
   async getItems(category) {
-    let sql = `Select * from items where id in(select item_id from categories where ${category} = 1)`;
+    var i;
+    let cat = category.split(',');
+    let sql1 = `${cat[0]} = 1`
+    for( i = 1; i < cat.length; i++){
+      sql1 = sql1.concat(` and ${cat[i]} = 1`);
+    }
+    let sql = `Select * from items where id in(select item_id from categories where ${sql1})`;
+    console.log(sql)
     let res = await mysql.query(sql);
     return (res[0].length ? res[0] : null);
   }
+
   async getItem(id) {
     let sql = `Select * from items where id = "${id}"`;
     let res = await mysql.query(sql);
@@ -68,10 +77,16 @@ class UtilsDB {
     return result;
   }
 
-  async viewCart(req, email) {
-    let sql = `select * from users_cart where user_email = "${email}"`;
+  async viewCart(email) {
+    let sql = `select users_cart.*, items.image_link ,items.title from users_cart left join items on users_cart.item_id = items.id where users_cart.user_email = "${email}"`
     let result = await mysql.query(sql);
     return (result[0].length ? result[0] : null);
+  }
+
+  async removeItem(id,email){
+    let sql = `Delete from users_cart where cart_id = '${id}' and user_email = "${email}"`;
+    let result = await mysql.query(sql);
+    return 'Item Removed From Cart'
   }
 }
 module.exports = UtilsDB;

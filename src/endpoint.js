@@ -28,13 +28,18 @@ class Endpoint {
     return result;
   }
 
+  async removeItem(id,email){
+    let result = await utils.removeItem(id,email);
+    return result;
+  }
+
   async addToCart(req, email) {
     let result = await utils.addToCart(req, email);
     return result;
   }
 
   async viewCart(req, email) {
-    let result = await utils.viewCart(req, email);
+    let result = await utils.viewCart(email);
     return result;
   }
 
