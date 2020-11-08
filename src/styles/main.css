@@ -1,0 +1,150 @@
+@font-face { font-family: lobster; src: url('../fonts/LobsterTwo-Bold.otf'); }
+@font-face { font-family: fff; src: url('../fonts/FFF_Tusj.ttf'); }
+@font-face { font-family: trajan; src: url('../fonts/Trajan\ Pro.ttf')}
+:root {
+    --body-color: #000;
+    --inverted-body: #fff;
+    --text: #fff;
+    --inverted-text: #000;
+}
+html, body {
+    background-color: black;
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none;
+    color: var(--text);
+    display: inline-block;
+    overflow: auto;
+    margin-top: 0px;
+    font-family: trajan;
+    width: 100vw;
+    min-height: 100vh;
+    background-color: #000;
+    overflow: scroll;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;
+  }
+  html::-webkit-scrollbar, body::-webkit-scrollbar {
+      display: none;
+  }
+  html {
+      font-family: trajan;
+  }
+.red {
+  color: rgb(187, 0, 0);
+}
+.grey {
+    color: grey;
+}
+.white {
+    color: white;
+}
+.verticle-aligned {
+    display: inline-block;
+    vertical-align: middle;
+}
+.white {
+    color: transparent;
+    background: linear-gradient(45deg, white, grey, white);
+    background-clip: text;
+}
+.golden {
+    background-image: linear-gradient(
+	to right,
+	#8b6224 0,
+    rgb(112, 72, 13) 22%, 
+	#b8873e 45%,
+	#d6af5b 50%,
+	#ca9f41 55%,
+	#b8873e 78%,
+	rgb(112, 72, 13) 100%
+	);
+   color: transparent;
+   background-clip: text;
+   -webkit-background-clip: text;
+}
+@media only screen and (max-width: 768px) {
+    @media only screen and (max-height: 992px) {
+    .d-xs-none {
+            display: none !important;
+    }
+}
+  }
+.row {
+    margin: 0px;
+    margin: 0px;
+}
+@media screen and (orientation: portrait) {
+    .logo-nav {
+      padding-bottom: 10px;
+      padding-top: 30px;
+    }
+  }
+  @keyframes fading {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes initialLoad {
+    0% {
+    height: 100vh;
+    padding-top: 20vh;
+    }
+    70% {
+    height: 100vh;
+    padding-top: 10vh;
+    }
+    100% {
+    height: 20vh;
+    }
+  }
+  @keyframes invisible {
+    0% {
+    opacity: 0;
+    display: none;
+    }
+    100% {
+    opacity: 1;
+    display: inline
+    }
+  }
+  @keyframes disable {
+    0% {
+    opacity: 0;
+    display: none;
+    }
+    100% {
+    opacity: 1;
+    display: inline
+    }
+  }
+  @keyframes delayed {
+    0% {
+      opacity: 0;
+    }
+    30% {
+      opacity: 0;
+    }
+    60% {
+      opacity: 0.6;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  @keyframes slide-left {
+      from {
+          transform: translate(-100%, 0);
+      }
+      to {
+        transform: translate(0%, 0);
+      }
+  }
